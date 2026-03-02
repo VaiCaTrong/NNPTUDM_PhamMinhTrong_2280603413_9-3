@@ -19,16 +19,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect('mongodb://localhost:27017');
+mongoose.connect('mongodb://localhost:27017/NNPTUD-C2');
 mongoose.connection.on('connected', () => {
-  console.log("connected");
-})
-mongoose.connection.on('', () => {
   console.log("connected");
 })
 
 app.use('/api/v1/', require('./routes/index'));
 app.use('/api/v1/users', require('./routes/users'));
+app.use('/api/v1/roles', require('./routes/roles'));
 app.use('/api/v1/products', require('./routes/products'));
 app.use('/api/v1/categories', require('./routes/categories'));
 
