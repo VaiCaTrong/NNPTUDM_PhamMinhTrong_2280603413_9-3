@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-
+let { checkLogin, checkRole } = require('../utils/authHandler.js')
 let roleModel = require("../schemas/roles");
 
 
@@ -10,7 +10,7 @@ router.get("/", async function (req, res, next) {
 });
 
 
-router.get("/:id", async function (req, res, next) {
+router.get("/:id", checkLogin, checkRole("ADMIN", "MODERATOR"), async function (req, res, next) {
     try {
         let result = await roleModel.find({ _id: req.params.id, isDeleted: false });
         if (result.length > 0) {
@@ -38,7 +38,7 @@ router.post("/", async function (req, res, next) {
     }
 });
 
-router.put("/:id", async function (req, res, next) {
+router.put("/:id", checkLogin, checkRole("ADMIN"), async function (req, res, next) {
     try {
         let id = req.params.id;
         let updatedItem = await roleModel.findByIdAndUpdate(id, req.body, { new: true });
@@ -51,7 +51,7 @@ router.put("/:id", async function (req, res, next) {
     }
 });
 
-router.delete("/:id", async function (req, res, next) {
+router.delete("/:id", checkLogin, checkRole("ADMIN"), async function (req, res, next) {
     try {
         let id = req.params.id;
         let updatedItem = await roleModel.findByIdAndUpdate(

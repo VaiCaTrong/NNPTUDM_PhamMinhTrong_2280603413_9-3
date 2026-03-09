@@ -21,8 +21,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect('mongodb://localhost:27017/NNPTUD-C2');
 mongoose.connection.on('connected', () => {
-  console.log("connected");
-})
+  console.log("MongoDB connected successfully");
+});
+mongoose.connection.on('error', (err) => {
+  console.log("MongoDB connection error:", err);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log("MongoDB disconnected");
+});
 
 app.use('/api/v1/', require('./routes/index'));
 app.use('/api/v1/users', require('./routes/users'));

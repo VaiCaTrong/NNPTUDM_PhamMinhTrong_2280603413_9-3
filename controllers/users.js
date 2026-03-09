@@ -1,4 +1,6 @@
 let userModel = require('../schemas/users')
+let bcrypt = require('bcrypt');
+
 module.exports = {
     CreateAnUser: async function (username, password, email, role,
         avatarUrl, fullName, status, loginCount
@@ -21,6 +23,10 @@ module.exports = {
         if (!getUser) {
             return false;
         }
+        let checkPassword = bcrypt.compareSync(password, getUser.password);
+        if (!checkPassword) {
+            return false;
+        }
         return getUser;
     },
     FindUserById: async function (id) {
@@ -28,5 +34,17 @@ module.exports = {
             _id: id,
             isDeleted:false
         }).populate('role')
+    },
+    changePassword: async function (id, oldPassword, newPassword) {
+        let user = await userModel.findById(id);
+        if (!user) throw new Error("User not found");
+
+        let checkPass = bcrypt.compareSync(oldPassword, user.password);
+        if (!checkPass) throw new Error("Old password is incorrect");
+
+        user.password = newPassword;
+        // Pre-save hook in schema will hash this new password
+        await user.save();
+        return user;
     }
 }

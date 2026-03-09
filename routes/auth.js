@@ -7,14 +7,16 @@ let { checkLogin } = require('../utils/authHandler.js')
 /* GET home page. */
 //localhost:3000
 router.post('/register', async function (req, res, next) {
+    let roleId = req.body.role || "69a5462f086d74c9e772b804"; // Mặc định là USER
     let newUser = await userController.CreateAnUser(
         req.body.username,
         req.body.password,
         req.body.email,
-        "69a5462f086d74c9e772b804"
+        roleId
     )
     res.send({
-        message: "dang ki thanh cong"
+        message: "dang ki thanh cong",
+        user: newUser
     })
 });
 router.post('/login', async function (req, res, next) {
@@ -49,7 +51,17 @@ router.post('/logout', checkLogin, function (req, res, next) {
     })
     res.send("da logout ")
 })
-
-
+router.post('/change-password', checkLogin, async function (req, res, next) {
+    try {
+        let { oldPassword, newPassword } = req.body;
+        if (!oldPassword || !newPassword) {
+            return res.status(400).send({ message: "Vui long nhap oldPassword va newPassword" });
+        }
+        await userController.changePassword(req.userId, oldPassword, newPassword);
+        res.send({ message: "Doi mat khau thanh cong" });
+    } catch (error) {
+        res.status(400).send({ message: error.message });
+    }
+});
 
 module.exports = router;
